@@ -1,0 +1,9 @@
+{
+  "name": "krovotkinskaya",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Cinematic horror remaster with alien surface textures, opening cutscene and raycast-fired portal weapon",
+  "scripts": {
+    "serve": "python -m http.server 8000"
+  }
+}

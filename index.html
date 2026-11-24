@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090c" />
+  <meta name="description" content="Кровоткинская — атмосферный браузерный хоррор от первого лица. Remaster 4.0." />
+  <title>КРОВОТКИНСКАЯ — REMASTER 4.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <div id="game-root">
+    <canvas id="game-canvas"></canvas>
+    <div id="scene-fade"></div>
+    <div id="rotate-overlay" aria-live="polite"><div class="rotate-card"><div class="rotate-glyph">↻</div><strong>ПОВЕРНИ ТЕЛЕФОН</strong><span>ИГРА РАБОТАЕТ В ГОРИЗОНТАЛЬНОМ РЕЖИМЕ</span></div></div>
+    <div id="vignette"></div>
+    <div id="grain"></div>
+
+    <div id="intro-copy" class="screen hidden">
+      <div class="intro-topline"><span>КРОВОТКИНСКАЯ / АРХИВ 008</span><span>МОСКВА · 03:17 · 24.11.2026</span></div>
+      <div class="intro-side-index">ОБЪЕКТ<br><b>ХРАМ</b><br>СЕКТОР 09<br><span>НЕ СМОТРЕТЬ В КУПОЛ</span></div>
+      <div class="intro-bottom">
+        <div class="intro-kicker"><i></i> НЕЗАРЕГИСТРИРОВАННОЕ ПРОИСШЕСТВИЕ № 008</div>
+        <h1>КРОВОТКИНСКАЯ<span>_</span></h1>
+        <p>Они вошли не с неба. Они вышли из-под земли.</p>
+        <button id="start-button" class="primary-button"><span class="button-index">01</span> НАЧАТЬ ИСТОРИЮ <b>↗</b></button>
+        <div class="intro-foot">WASD — ДВИЖЕНИЕ &nbsp;·&nbsp; МЫШЬ — ОБЗОР &nbsp;·&nbsp; E — ВЗАИМОДЕЙСТВИЕ</div>
+      </div>
+      <div class="intro-bottom-rule"><span>КЛАССИФИКАЦИЯ: ЗАСЕКРЕЧЕНО</span><span>ЗАПИСЬ ПОВРЕЖДЕНА // 00:00:08</span></div>
+    </div>
+    <div id="cinematic-overlay" class="cinematic-overlay hidden" aria-live="polite">
+      <div class="cinematic-top"><span>АРХИВ 008</span><span>ЗАПИСЬ ВОССТАНОВЛЕНА</span></div>
+      <div class="cinematic-center"><div class="cinematic-redline"></div><div class="cinematic-caption" id="cinematic-caption">03:17 / КАМЕРА НАБЛЮДЕНИЯ</div><div class="cinematic-subcaption">ХРАМ ХРИСТА СПАСИТЕЛЯ · МОСКВА</div></div>
+      <button id="cinematic-skip" class="cinematic-skip">ПРОПУСТИТЬ СЦЕНУ <span>»</span></button>
+      <div class="cinematic-bottom"><span>СИГНАЛ НАРУШЕН</span><span>REC <i></i> 00:00:00</span></div>
+    </div>
+
+    <div id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="chapter-mark"><span class="chapter-dot"></span><span id="chapter-name">ГЛАВА 01 / ХРАМ</span></div>
+        <div class="objective"><span class="objective-label">ТЕКУЩАЯ ЗАДАЧА</span><span id="objective-text">Найти вход в церковь</span></div>
+        <button id="pause-button" class="icon-button" aria-label="Пауза">Ⅱ</button>
+      </div>
+      <div id="crosshair"><i></i><b></b></div>
+      <div id="interact-prompt" class="interact-prompt hidden"><span class="keycap">E</span><span id="interact-label">ВЗАИМОДЕЙСТВОВАТЬ</span></div>
+      <div class="hud-bottom">
+        <div class="status-block"><div class="status-caption">СОСТОЯНИЕ</div><div class="health-track"><span id="health-fill"></span></div><div id="health-value">100 / 100</div></div>
+        <div id="inventory" class="inventory">
+          <div class="slot active" data-slot="1"><span class="slot-number">1</span><span class="slot-icon">◌</span><span class="slot-name">ЗАЖИГАЛКА</span></div>
+          <div class="slot" data-slot="2"><span class="slot-number">2</span><span class="slot-icon">⌁</span><span class="slot-name">АВТОМАТ</span></div>
+          <div class="slot" data-slot="3"><span class="slot-number">3</span><span class="slot-icon">◎</span><span class="slot-name">ПОРТАЛ</span></div>
+        </div>
+        <div class="location-readout"><span class="location-coord">55°44' N / 37°36' E</span><span id="location-name">ХРАМ ХРИСТА СПАСИТЕЛЯ</span></div>
+      </div>
+      <div id="toast" class="toast"></div>
+      <div id="damage-flash"></div>
+      <div id="dialogue" class="dialogue hidden"><div class="dialogue-speaker" id="dialogue-speaker">НЕИЗВЕСТНЫЙ</div><div id="dialogue-text"></div><div class="dialogue-next">E / ENTER — ПРОДОЛЖИТЬ</div></div>
+      <div id="flight-reticle" class="flight-reticle hidden" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+      <div id="flight-hud" class="flight-hud hidden"><div><span>КУРС</span><b id="flight-heading">N 000°</b></div><div><span>ИМПУЛЬС</span><b id="flight-boost">ГОТОВ</b></div><div><span>ЦЕЛИ</span><b id="flight-score">0 / 5</b></div></div>
+      <div id="shift-prompt" class="shift-prompt hidden"><strong>SHIFT</strong><span>ПРОЙТИ СКВОЗЬ ПРОСТРАНСТВО</span></div>
+      <div id="touch-controls" class="touch-controls hidden" aria-label="Сенсорное управление">
+        <div id="touch-look" class="touch-look" aria-label="Проведите пальцем для обзора"></div>
+        <div id="move-stick" class="move-stick"><div class="stick-ring"></div><div id="stick-knob" class="stick-knob"></div><span>MOVE</span></div>
+        <div class="touch-actions">
+          <button class="touch-btn touch-interact" data-touch="interact" aria-label="Взаимодействовать">E</button>
+          <button class="touch-btn touch-fire" data-touch="fire" aria-label="Стрелять">FIRE</button>
+          <button class="touch-btn touch-sprint" data-touch="sprint" aria-label="Бег или ускорение">RUN</button>
+          <button class="touch-btn touch-portal" data-touch="portal" aria-label="Выстрелить порталом">PORTAL</button>
+          <button class="touch-btn touch-ultra" data-touch="ultra" aria-label="Ультраудар">F</button>
+          <button class="touch-btn touch-transition" data-touch="transition" aria-label="Пространственный переход">SHIFT</button>
+          <button class="touch-btn touch-up" data-touch="up" aria-label="Набрать высоту">▲</button>
+          <button class="touch-btn touch-down" data-touch="down" aria-label="Снизиться">▼</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pause-screen" class="menu-screen hidden">
+      <div class="menu-panel"><div class="menu-eyebrow">СИСТЕМА / ПРИОСТАНОВЛЕНА</div><h2>ПАУЗА<span>_</span></h2>
+        <button id="resume-button" class="primary-button full">ПРОДОЛЖИТЬ</button>
+        <div class="settings-block"><label for="volume-slider">ГРОМКОСТЬ <span id="volume-value">65%</span></label><input id="volume-slider" type="range" min="0" max="100" value="65"></div>
+        <div class="settings-block"><label for="quality-select">КАЧЕСТВО ГРАФИКИ</label><select id="quality-select"><option value="high">ВЫСОКОЕ (ПК)</option><option value="medium">СБАЛАНСИРОВАННОЕ</option><option value="low">ПРОИЗВОДИТЕЛЬНОСТЬ</option></select></div>
+        <div class="control-note">WASD — движение · мышь — обзор · E — действие<br>ЛКМ — автомат в Садовых кварталах · Q / ПКМ — выстрел портальной пушки / огонь с тарелки<br>В тарелке: WASD — полёт · мышь — прицел · ПКМ — огонь · Shift — ускорение / переход после 5 целей · F — ультраудар · Space/Ctrl — высота · ESC — пауза</div>
+        <button id="restart-button" class="text-button">НАЧАТЬ СНАЧАЛА</button>
+      </div>
+    </div>
+
+    <div id="ending-screen" class="screen hidden">
+      <div id="ending-code" class="ending-code">CYCLE 001 · TERMINATED / RESTARTING</div>
+      <div class="ending-center"><div class="ending-symbol">◉</div><div class="ending-label">КОНЕЦ ПЕРВОГО ЦИКЛА</div><h2>КРОВОТКИНСКАЯ<span>_</span></h2><p>Он уже встречал тебя. Просто не в этой версии.</p><button id="loop-button" class="primary-button">ПОВТОРИТЬ ЦИКЛ ↻</button></div>
+      <div class="ending-footer">АРХИВ ВОССТАНОВЛЕН · ВХОДЯЩЕЕ СОБЫТИЕ НЕ ОПРЕДЕЛЕНО</div>
+    </div>
+
+    <div id="loading-cover" class="loading-cover">
+      <div class="loading-mark">К<span>.</span></div>
+      <div class="loading-line" id="loading-line"><i></i></div>
+      <div class="loading-caption" id="loading-caption">ВОССТАНОВЛЕНИЕ ПРОСТРАНСТВА</div>
+      <div class="loading-help hidden" id="loading-help">Проверьте подключение к интернету и откройте игру через START_GAME.bat или локальный сервер.</div>
+      <button id="loading-retry" class="primary-button hidden" type="button">ПОВТОРИТЬ ЗАПУСК <span>↻</span></button>
+    </div>
+  </div>
+  <script type="module" src="./src/boot.js"></script>
+</body>
+</html>
